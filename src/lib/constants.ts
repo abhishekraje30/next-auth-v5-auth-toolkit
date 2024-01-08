@@ -5,3 +5,5 @@ export const REGISTER_ROUTE = "/auth/register";
 export const API_AUTH_PREFIX = "/api/auth";
 
 export const DEFAULT_LOGIN_REDIRECT = "/settings";
+
+export const ERROR_ROUTE = "/auth/error";

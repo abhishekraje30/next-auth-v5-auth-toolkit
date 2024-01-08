@@ -4,6 +4,7 @@ import { db } from "./lib/db";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { getUserById } from "./data/user";
 import { UserRole } from "@prisma/client";
+import { ERROR_ROUTE, LOGIN_ROUTE } from "./lib/constants";
 
 export const {
   handlers: { GET, POST },
@@ -11,6 +12,18 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
+  pages: {
+    signIn: LOGIN_ROUTE,
+    error: ERROR_ROUTE,
+  },
+  events: {
+    async linkAccount({ user }) {
+      await db.user.update({
+        where: { id: user.id },
+        data: { emailVerified: new Date() },
+      });
+    },
+  },
   callbacks: {
     async jwt({ token, user, account, profile }) {
       console.log({ token, user, account, profile });
