@@ -37,7 +37,6 @@ export const {
       return true;
     },
     async jwt({ token, user, account, profile }) {
-      console.log({ token, user, account, profile });
       if (!token.sub) return token;
 
       const existingUser = await getUserById(token.sub);
@@ -55,7 +54,6 @@ export const {
       if (token.role && session.user) {
         session.user.role = token.role as UserRole;
       }
-      console.log({ sessionToken: token });
       return session;
     },
   },

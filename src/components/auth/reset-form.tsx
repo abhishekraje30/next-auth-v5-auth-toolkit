@@ -1,9 +1,8 @@
 "use client";
 import CardWrapper from "@/components/auth/card-wrapper";
 import { useForm } from "react-hook-form";
-import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginSchema } from "@/schemas";
+import { ResetPasswordSchema } from "@/schemas";
 import {
   Form,
   FormControl,
@@ -20,33 +19,27 @@ import { FormError } from "@/components/form-error";
 import { FormSuccess } from "../form-success";
 import { login } from "../../../actions/login";
 import Link from "next/link";
-import { REGISTER_ROUTE, RESET_PASSWORD_ROUTE } from "@/lib/constants";
+import { LOGIN_ROUTE, RESET_PASSWORD_ROUTE } from "@/lib/constants";
+import { reset } from "../../../actions/reset-password";
 
-export const LoginForm = () => {
-  const searchParams = useSearchParams();
-  const urlError =
-    searchParams.get("error") === "OAuthAccountNotLinked"
-      ? "Email already in use. Please login with your existing account."
-      : "";
-
+export const ResetForm = () => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
-  const form = useForm<z.infer<typeof LoginSchema>>({
-    resolver: zodResolver(LoginSchema),
+  const form = useForm<z.infer<typeof ResetPasswordSchema>>({
+    resolver: zodResolver(ResetPasswordSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof LoginSchema>) => {
+  const onSubmit = (values: z.infer<typeof ResetPasswordSchema>) => {
     setError("");
     setSuccess("");
 
     startTransition(() => {
-      login(values).then((data) => {
-        setError(data?.error);
+      reset(values).then((data) => {
+        setError(data?.errors);
         // TODO: Add when 2 Factor Auth is implemented
         setSuccess(data?.success);
       });
@@ -55,10 +48,9 @@ export const LoginForm = () => {
 
   return (
     <CardWrapper
-      headerLabel="Welcome Back"
-      backButtonLabel="Don't have an account?"
-      backButtonHref={REGISTER_ROUTE}
-      showSocial
+      headerLabel="Forgot Password"
+      backButtonLabel="Back to Login"
+      backButtonHref={LOGIN_ROUTE}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -83,39 +75,11 @@ export const LoginForm = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      disabled={isPending}
-                      placeholder="**********"
-                      type="password"
-                    />
-                  </FormControl>
-                  <Button
-                    size="sm"
-                    variant="link"
-                    asChild
-                    className="px-0 font-normal"
-                  >
-                    <Link href={RESET_PASSWORD_ROUTE}>Forgot password?</Link>
-                  </Button>
-                  <FormMessage>
-                    {form.formState.errors.password?.message}
-                  </FormMessage>
-                </FormItem>
-              )}
-            />
           </div>
-          <FormError message={error || urlError} />
+          <FormError message={error} />
           <FormSuccess message={success} />
           <Button type="submit" className="w-full" disabled={isPending}>
-            Login
+            Send reset email
           </Button>
         </form>
       </Form>
