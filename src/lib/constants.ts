@@ -13,3 +13,9 @@ export const VERIFICATION_ROUTE = "/auth/new-verification";
 export const RESET_PASSWORD_ROUTE = "/auth/reset-password";
 
 export const NEW_PASSWORD_ROUTE = "/auth/new-password";
+
+export const SETTINGS_ROUTE = "/settings";
+
+export const SERVER_COMPONENET_ROUTE = "/server";
+export const CLIENT_COMPONENET_ROUTE = "/client";
+export const ADMIN_ROUTE = "/admin";
