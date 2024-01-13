@@ -5,6 +5,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { getUserById } from "./data/user";
 import { UserRole } from "@prisma/client";
 import { ERROR_ROUTE, LOGIN_ROUTE } from "./lib/constants";
+import { getTwoFactorConfirmationByUserId } from "./data/two-factor-confirmation";
 
 export const {
   handlers: { GET, POST },
@@ -34,6 +35,16 @@ export const {
       if (!existingUser?.emailVerified) return false;
 
       // TODO: Send email verification email
+      if (existingUser.isTwoFactorEnabled) {
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+          existingUser.id
+        );
+        if (!twoFactorConfirmation) return false;
+
+        await db.twoFactorConfirmation.delete({
+          where: { id: twoFactorConfirmation.id },
+        });
+      }
       return true;
     },
     async jwt({ token, user, account, profile }) {
